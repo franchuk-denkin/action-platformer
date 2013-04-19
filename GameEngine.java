@@ -10,6 +10,7 @@ public class GameEngine {
     JPanel area;
     HashSet<Integer> keys;
     Menu mainMenu;
+    boolean paused;
     boolean mainMenuDisplayed;
     LinkedList<GameObject> objList;
 
@@ -47,7 +48,7 @@ public class GameEngine {
     void nextFrame(long delta, Graphics2D g) {
         if(mainMenuDisplayed)
             mainMenu.draw(delta, g);
-        else {
+        else if (!paused) {
             for (GameObject go:objList)
                 go.update(delta);
         }
@@ -93,5 +94,11 @@ public class GameEngine {
 
     void deleteObject(GameObject g){
         objList.remove(g);
+    }
+    void pause(){
+        paused=true;
+    }
+    void resume(){
+        paused=false;
     }
 }
