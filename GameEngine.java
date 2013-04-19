@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 public class GameEngine {
     JFrame window;
@@ -10,6 +11,7 @@ public class GameEngine {
     HashSet<Integer> keys;
     Menu mainMenu;
     boolean mainMenuDisplayed;
+    LinkedList<GameObject> objList;
 
     GameEngine() {
         keys = new HashSet<Integer>();
@@ -17,7 +19,7 @@ public class GameEngine {
         window = new JFrame();
         window.setLayout(new BorderLayout());
         window.setSize(800, 600);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
 
         area = new JDrawingArea(this);
@@ -45,6 +47,10 @@ public class GameEngine {
     void nextFrame(long delta, Graphics2D g) {
         if(mainMenuDisplayed)
             mainMenu.draw(delta, g);
+        else {
+            for (GameObject go:objList)
+                go.update(delta);
+        }
     }
 
     int width() {
@@ -79,5 +85,13 @@ public class GameEngine {
             });
         }
         mainMenuDisplayed = true;
+    }
+
+    void addObject(GameObject g) {
+        objList.add(g);
+    }
+
+    void deleteObject(GameObject g){
+        objList.remove(g);
     }
 }
