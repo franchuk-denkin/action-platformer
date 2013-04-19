@@ -69,6 +69,7 @@ public class GameEngine {
     void showMainMenu() {
         if (mainMenu == null) {
             mainMenu = new Menu(this);
+            final GameEngine engine = this;
             mainMenu.addItem("Нова гра", new Runnable() {
                 @Override
                 public void run() {
@@ -82,6 +83,7 @@ public class GameEngine {
             mainMenu.addItem("Вийти", new Runnable() {
                 @Override
                 public void run() {
+                    engine.exit();
                 }
             });
         }
@@ -100,5 +102,8 @@ public class GameEngine {
     }
     void resume(){
         paused=false;
+    }
+    void exit(){
+        window.setVisible(false);
     }
 }
