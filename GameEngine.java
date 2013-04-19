@@ -43,6 +43,7 @@ public class GameEngine {
         });
 
         showMainMenu();
+        objList= new LinkedList<GameObject>();
     }
 
     void nextFrame(long delta, Graphics2D g) {
