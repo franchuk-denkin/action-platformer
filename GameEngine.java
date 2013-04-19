@@ -9,9 +9,9 @@ public class GameEngine {
     JFrame window;
     JPanel area;
     HashSet<Integer> keys;
-    Menu mainMenu;
+    Menu mainMenu, inGameMenu;
     boolean paused;
-    boolean mainMenuDisplayed;
+    boolean mainMenuDisplayed, inGameMenuDisplayed;
     LinkedList<GameObject> objList;
 
     GameEngine() {
@@ -48,7 +48,9 @@ public class GameEngine {
     void nextFrame(long delta, Graphics2D g) {
         if(mainMenuDisplayed)
             mainMenu.draw(delta, g);
-        else if (!paused) {
+        else if (inGameMenuDisplayed)
+            inGameMenu.draw(delta, g);
+        else {
             for (GameObject go:objList)
                 go.update(delta);
         }
@@ -97,13 +99,38 @@ public class GameEngine {
     void deleteObject(GameObject g){
         objList.remove(g);
     }
+
     void pause(){
-        paused=true;
+        paused = true;
+        showInGameMenu();
     }
+
     void resume(){
-        paused=false;
+        paused = false;
+        inGameMenuDisplayed = false;
     }
     void exit(){
         window.setVisible(false);
+    }
+
+    void showInGameMenu() {
+        inGameMenuDisplayed = true;
+        final GameEngine engine = this;
+        if(inGameMenu == null) {
+            inGameMenu = new Menu(this);
+            inGameMenu.addItem("Продовжити", new Runnable() {
+                @Override
+                public void run() {
+                    engine.resume();
+                }
+            });
+            inGameMenu.addItem("Вийти в головне меню", new Runnable() {
+                @Override
+                public void run() {
+                    engine.resume();
+                    engine.showMainMenu();
+                }
+            });
+        }
     }
 }
