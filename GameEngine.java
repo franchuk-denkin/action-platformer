@@ -21,7 +21,6 @@ public class GameEngine {
         window.setLayout(new BorderLayout());
         window.setSize(800, 600);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        window.setVisible(true);
 
         area = new JDrawingArea(this);
         window.add(area, BorderLayout.CENTER);
@@ -44,6 +43,7 @@ public class GameEngine {
 
         showMainMenu();
         objList= new LinkedList<GameObject>();
+        window.setVisible(true);
     }
 
     void nextFrame(long delta, Graphics2D g) {
