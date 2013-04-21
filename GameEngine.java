@@ -53,7 +53,7 @@ public class GameEngine {
             inGameMenu.draw(delta, g);
         else {
             for (GameObject go:objList)
-                go.update(delta);
+                go.update(delta, g);
         }
     }
 
@@ -76,6 +76,7 @@ public class GameEngine {
             mainMenu.addItem("Нова гра", new Runnable() {
                 @Override
                 public void run() {
+                    engine.newGame();
                 }
             });
             mainMenu.addItem("Завантажити гру", new Runnable() {
@@ -133,5 +134,16 @@ public class GameEngine {
                 }
             });
         }
+    }
+
+    void loadLevel(String file) {
+        objList.clear();
+        addObject(new Level(this, file));
+        mainMenuDisplayed = false;
+        inGameMenuDisplayed = false;
+    }
+
+    void newGame() {
+        loadLevel("1");
     }
 }

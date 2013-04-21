@@ -1,4 +1,6 @@
-public abstract class GameObject {
+import java.awt.*;
+
+public class GameObject {
     Drawable drawable;
     GeometricObject geometry;
 
@@ -10,5 +12,7 @@ public abstract class GameObject {
         return geometry;
     }
 
-    public abstract void update(long delta);
+    public void update(long delta, Graphics2D g) {
+        drawable.draw(g);
+    }
 }
