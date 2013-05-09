@@ -2,7 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -12,6 +16,7 @@ public class GameEngine {
     HashSet<Integer> keys;
     Menu mainMenu, inGameMenu;
     boolean paused;
+    String leveln;
     boolean mainMenuDisplayed, inGameMenuDisplayed;
     SortedSet<GameObject> objList;
     Player player;
@@ -89,6 +94,7 @@ public class GameEngine {
             mainMenu.addItem("Завантажити гру", new Runnable() {
                 @Override
                 public void run() {
+                    loadGame();
                 }
             });
             mainMenu.addItem("Вийти", new Runnable() {
@@ -113,7 +119,24 @@ public class GameEngine {
         paused = true;
         showInGameMenu();
     }
+    void saveGame(String file){
+        try { PrintStream out = new PrintStream(new FileOutputStream("C:\\actionplatformer.sav"));
+        out.print(file);
+        out.close();
+        }
+        catch(Exception e) {
+        }
+    }
 
+    void loadGame(){
+        try { Scanner in = new Scanner(new FileInputStream("C:\\actionplatformer.sav"));
+            leveln = in.next();
+            in.close();
+            loadLevel(leveln);
+        }
+        catch(Exception e) {
+        }
+    }
     void resume(){
         paused = false;
         inGameMenuDisplayed = false;
@@ -145,6 +168,7 @@ public class GameEngine {
 
     void loadLevel(String file) {
         objList.clear();
+        saveGame(file);
         addObject(new Level(this, file));
         mainMenuDisplayed = false;
         inGameMenuDisplayed = false;
