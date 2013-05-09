@@ -3,7 +3,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class GameEngine {
     JFrame window;
@@ -12,7 +13,8 @@ public class GameEngine {
     Menu mainMenu, inGameMenu;
     boolean paused;
     boolean mainMenuDisplayed, inGameMenuDisplayed;
-    LinkedList<GameObject> objList;
+    SortedSet<GameObject> objList;
+    Player player;
 
     GameEngine() {
         keys = new HashSet<Integer>();
@@ -42,8 +44,12 @@ public class GameEngine {
         });
 
         showMainMenu();
-        objList= new LinkedList<GameObject>();
+        objList= new TreeSet<GameObject>();
         window.setVisible(true);
+    }
+
+    void setPlayer(Player player) {
+        this.player = player;
     }
 
     void nextFrame(long delta, Graphics2D g) {
@@ -52,6 +58,7 @@ public class GameEngine {
         else if (inGameMenuDisplayed)
             inGameMenu.draw(delta, g);
         else {
+            g.translate(-player.getX() - player.width / 2 + width() / 2, -player.getY() - player.height / 2 + height() / 2);
             for (GameObject go:objList)
                 go.update(delta, g);
         }
@@ -145,5 +152,9 @@ public class GameEngine {
 
     void newGame() {
         loadLevel("1");
+    }
+
+    public SortedSet<GameObject> getObjList() {
+        return objList;
     }
 }

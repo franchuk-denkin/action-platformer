@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class LevelGeometry implements GeometricObject, Drawable {
+public class LevelGeometry extends Drawable implements GeometricObject {
     BufferedImage layout, visual;
     GameEngine engine;
 
@@ -13,13 +13,21 @@ public class LevelGeometry implements GeometricObject, Drawable {
 
     @Override
     public void draw(Graphics2D canvas) {
-        canvas.translate(engine.width() / 2, engine.height() / 2);
-        canvas.drawImage(visual, -visual.getWidth() / 2, -visual.getHeight() / 2, null);
-        canvas.translate(-engine.width() / 2, -engine.height() / 2);
+        canvas.translate(translationX, translationY);
+        canvas.drawImage(visual, 0, 0, null);
+        canvas.translate(-translationX, -translationY);
     }
 
     @Override
-    public boolean checkColission(GeometricObject g) {
+    public boolean checkCollision(GeometricObject g) {
         return false;
+    }
+
+    @Override
+    public int intersectWithDownRay(int x, int y) {
+        for (int i = y; i < layout.getHeight(); i++)
+            if(layout.getRGB(x, i) == 0xff000000)
+                return i;
+        return Integer.MAX_VALUE;
     }
 }
