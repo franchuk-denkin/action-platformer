@@ -30,4 +30,8 @@ public class LevelGeometry extends Drawable implements GeometricObject {
                 return i;
         return Integer.MAX_VALUE;
     }
+    @Override
+    public boolean checkCoverage(int x, int y)   {
+        return layout.getRGB(x,y) == 0xff000000;
+    }
 }
