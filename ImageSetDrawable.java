@@ -7,10 +7,10 @@ import java.io.IOException;
 public class ImageSetDrawable extends Drawable {
     private BufferedImage img;
 
-    public ImageSetDrawable(int x, int y) {
+    public ImageSetDrawable(String file, int x, int y) {
         setCoords(x, y);
         try {
-            img = ImageIO.read(new File("player.png"));
+            img = ImageIO.read(new File(file));
         }
         catch (IOException e) {
             e.printStackTrace();

@@ -23,42 +23,43 @@ public class Player extends GameObject {
 
     Player(int x, int y, GameEngine engine) {
         engine.setPlayer(this);
-        drawable = new ImageSetDrawable(x, y);
+        drawable = new ImageSetDrawable("player.png", x, y);
         geometry = new BoxedGeometry(x, y, width, height);
         this.x = x;
         this.y = y;
         this.engine = engine;
     }
 
-    @Override
-    public void update(long delta, Graphics2D g) {
-        // Гравітація
+    int orientation = 1;
+
+    private void move(long delta) {
+        // Горизонтальний рух
         SortedSet<GameObject> objList = engine.getObjList();
-        int min_y = Integer.MAX_VALUE;
         int multiplier = 0;
         int cx;
         if(engine.getKeys().contains(KeyEvent.VK_A))
-        multiplier = -1;
+            orientation = multiplier = -1;
         else if(engine.getKeys().contains(KeyEvent.VK_D))
-            multiplier = 1;
+            orientation = multiplier = 1;
         delta_x_sum += speed*multiplier*delta/1000000000.0;
         double delta_x = delta_x_sum;
         int i = multiplier;
-        boolean stolbik ;
+        boolean column ;
         while(Math.abs(i) <= Math.abs(delta_x) && multiplier != 0) {
-            stolbik=false;
+            column=false;
             for (int j = y; j < y + height; j++)
             {cx = multiplier == 1 ? x + width + i : x + i;
                 for(GameObject obj: engine.getObjList())
                     if (obj.getGeometry().checkCoverage(cx,j) && obj != this)
-                        stolbik=true;
+                        column=true;
             }
-            if (!stolbik)
+            if (!column)
                 x += multiplier;
             i += multiplier;
             delta_x_sum -= multiplier;
         }
-
+        // Гравітація
+        int min_y = Integer.MAX_VALUE;
         for (int x_ray = x; x_ray < x + width; x_ray++)
             for (GameObject obj : objList)
                 if (obj != this) {
@@ -82,10 +83,36 @@ public class Player extends GameObject {
                 falling = false;
             }
         }
-
+        // Оновити координати відображення та геометрії
         drawable.setCoords(x, y);
         ((BoxedGeometry)geometry).setCoords(x, y);
+    }
 
+    boolean attacking = false;
+    long attackStartTime;
+    final long attackDuration = 400000000; // 0.4s
+    final int swordAttack = 5;
+    final int attackRange = 10;
+    private void performAttack(long delta) {
+        if(System.nanoTime() - attackStartTime > attackDuration && attacking)
+            attacking = false;
+        if(!attacking && engine.getKeys().contains(KeyEvent.VK_K)) {
+            attacking = true;
+            attackStartTime = System.nanoTime();
+            for (GameObject obj : engine.getObjList()) {
+                if(obj instanceof Enemy) {
+                    if ((obj.getGeometry().checkCoverage(x + width + attackRange, y + height / 2) && orientation == 1) // атака вправо
+                        || (obj.getGeometry().checkCoverage(x - attackRange, y + height / 2) && orientation == -1)) // атака вліво
+                        ((Enemy)obj).attackIt(swordAttack);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void update(long delta, Graphics2D g) {
+        move(delta);
+        performAttack(delta);
         super.update(delta, g);
     }
 }

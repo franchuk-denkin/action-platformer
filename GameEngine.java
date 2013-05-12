@@ -64,8 +64,8 @@ public class GameEngine {
             inGameMenu.draw(delta, g);
         else {
             g.translate(-player.getX() - player.width / 2 + width() / 2, -player.getY() - player.height / 2 + height() / 2);
-            for (GameObject go:objList)
-                go.update(delta, g);
+            for (Object go: objList.toArray())
+                ((GameObject)go).update(delta, g);
         }
     }
 
