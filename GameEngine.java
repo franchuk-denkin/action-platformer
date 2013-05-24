@@ -5,15 +5,13 @@ import java.awt.event.KeyListener;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 public class GameEngine {
     JFrame window;
     JPanel area;
     HashSet<Integer> keys;
+    HashSet<Integer> pressedKeys;
     Menu mainMenu, inGameMenu;
     boolean paused;
     String leveln;
@@ -23,6 +21,7 @@ public class GameEngine {
 
     GameEngine() {
         keys = new HashSet<Integer>();
+        pressedKeys = new HashSet<Integer>();
 
         window = new JFrame();
         window.setLayout(new BorderLayout());
@@ -40,11 +39,14 @@ public class GameEngine {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 keys.add(keyEvent.getKeyCode());
+                pressedKeys.add(keyEvent.getKeyCode());
+                //keyTimes.put(keyEvent.getKeyCode(), -keyDelay);
             }
 
             @Override
             public void keyReleased(KeyEvent keyEvent) {
                 keys.remove(keyEvent.getKeyCode());
+                //keyTimes.remove(keyEvent.getKeyCode());
             }
         });
 
@@ -67,6 +69,7 @@ public class GameEngine {
             for (Object go: objList.toArray())
                 ((GameObject)go).update(delta, g);
         }
+        pressedKeys.clear();
     }
 
     int width() {
@@ -180,5 +183,9 @@ public class GameEngine {
 
     public SortedSet<GameObject> getObjList() {
         return objList;
+    }
+
+    public boolean keyPressed(int code) {
+        return pressedKeys.contains(code);
     }
 }

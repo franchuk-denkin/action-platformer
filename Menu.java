@@ -29,28 +29,17 @@ public class Menu {
     }
 
     public void draw(long delta, Graphics2D canvas) {
-        if (pressedInThisPass) {
-            timePassed += delta;
-            if (timePassed > timeToChange) {
-                timePassed = 0;
-                pressedInThisPass = false;
-            }
+        if(engine.keyPressed(KeyEvent.VK_DOWN)) {
+            activeItem++;
+            activeItem %= itemList.size();
         }
-        if(!pressedInThisPass) {
-            if (engine.getKeys().contains(KeyEvent.VK_DOWN)) {
-                activeItem++;
-                activeItem %= itemList.size();
-                pressedInThisPass = true;
-            }
-            if (engine.getKeys().contains(KeyEvent.VK_UP)) {
-                activeItem--;
-                if (activeItem < 0)
-                    activeItem += itemList.size();
-                pressedInThisPass = true;
-            }
-            if (engine.getKeys().contains(KeyEvent.VK_ENTER))
-                itemList.get(activeItem).runnable.run();
+        if(engine.keyPressed(KeyEvent.VK_UP)) {
+            activeItem--;
+            if (activeItem < 0)
+                activeItem += itemList.size();
         }
+        if (engine.keyPressed(KeyEvent.VK_ENTER))
+            itemList.get(activeItem).runnable.run();
         Font font = new Font(Font.SERIF, Font.BOLD, 40);
         FontMetrics metrics = canvas.getFontMetrics(font);
         int vsize = metrics.getHeight() * itemList.size();
