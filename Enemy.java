@@ -1,13 +1,14 @@
 import java.awt.*;
 
-public abstract class Enemy extends GameObject {
+public abstract class Enemy extends MovableObject {
     protected int health;
     protected GameEngine engine;
     protected boolean stunned = false;
     protected long stunnedAt;
     protected final long stunTime = 1000000000;
 
-    public Enemy(GameEngine eng) {
+    public Enemy(GameEngine eng, int x, int y) {
+        super(x, y, eng);
         engine = eng;
     }
 

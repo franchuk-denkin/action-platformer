@@ -4,21 +4,9 @@ import java.awt.geom.AffineTransform;
 import java.util.Set;
 import java.util.SortedSet;
 
-public class Player extends GameObject {
-    private int x, y;
-    private GameEngine engine;
-    public final int width = 30, speed = 200, defaultHeight = 50;
-    public int height = defaultHeight;
+public class Player extends MovableObject {
+    public final int defaultWidth = 30, defaultHeight = 50;
 
-    private long gravityFallingStartTime;
-    private long gravityFallingStartY;
-    public double delta_x_sum = 0;
-    private boolean falling = false;
-    private final int acceleration = 100;
-    private final int jumpingV = -50;
-    private boolean jumped = false;
-
-    private int startV = 0;
 
     private final AffineTransform identityTransform = new AffineTransform();
 
@@ -33,7 +21,10 @@ public class Player extends GameObject {
     }
 
     Player(int x, int y, GameEngine engine) {
+        super(x, y, engine);
         engine.setPlayer(this);
+        width = defaultWidth;
+        height = defaultHeight;
         drawable = new ImageSetDrawable(new String[]{"player.png", "player_1.png"}, x, y);
         geometry = new BoxedGeometry(x, y, width, height);
         this.x = x;
@@ -42,69 +33,15 @@ public class Player extends GameObject {
         priority = 100;
     }
 
-    int orientation = 1;
-
-    private void move(long delta) {
-        // Горизонтальний рух
-        SortedSet<GameObject> objList = engine.getObjList();
-        int multiplier = 0;
-        int cx;
+    private void performMove(long delta) {
+        multiplier = 0;
         if (!engine.getKeys().contains(KeyEvent.VK_SPACE))
-            if(engine.getKeys().contains(KeyEvent.VK_A))
+            if (engine.getKeys().contains(KeyEvent.VK_A))
                 orientation = multiplier = -1;
-            else if(engine.getKeys().contains(KeyEvent.VK_D))
+            else if (engine.getKeys().contains(KeyEvent.VK_D))
                 orientation = multiplier = 1;
-        delta_x_sum += speed*multiplier*delta/1000000000.0;
-        double delta_x = delta_x_sum;
-        int i = multiplier;
-        boolean column ;
-        while(Math.abs(i) <= Math.abs(delta_x) && multiplier != 0) {
-            column=false;
-            for (int j = y; j < y + height; j++)
-            {cx = multiplier == 1 ? x + width + i : x + i;
-                for(GameObject obj: engine.getObjList())
-                    if (obj.getGeometry().checkCoverage(cx,j) && obj != this)
-                        column=true;
-            }
-            if (!column)
-                x += multiplier;
-            i += multiplier;
-            delta_x_sum -= multiplier;
-        }
-        // Гравітація
-        int min_y = Integer.MAX_VALUE;
-        for (int x_ray = x; x_ray < x + width; x_ray++)
-            for (GameObject obj : objList)
-                if (obj != this) {
-                    int y_int = obj.getGeometry().intersectWithDownRay(x_ray, y);
-                    assert y_int >= y + height;
-                    min_y = Math.min(min_y, y_int);
-                }
-        if (min_y > y + height || jumped) {
-            jumped = false;
-            long timestamp = engine.getGameTime();
-            if (!falling) {
-                falling = true;
-                gravityFallingStartTime = timestamp;
-                gravityFallingStartY = y;
-            }
-            double delta_t = (engine.getGameTime() - gravityFallingStartTime) / 1000000000.0;
-            double delta_y = acceleration * delta_t * delta_t / 2 + startV * delta_t + gravityFallingStartY - y;
-            if (y + delta_y + height <= min_y)
-                y += delta_y;
-            else {
-                y = min_y - height;
-                falling = false;
-                startV = 0;
-            }
-        }
-        else if(engine.getKeys().contains(KeyEvent.VK_W) && !engine.getKeys().contains(KeyEvent.VK_SPACE)) {
-            jumped = true;
-            startV = jumpingV;
-        }
-        // Оновити координати відображення та геометрії
-        drawable.setCoords(x, y);
-        ((BoxedGeometry)geometry).setCoords(x, y);
+        jumpStartCondition = engine.getKeys().contains(KeyEvent.VK_W) && !engine.getKeys().contains(KeyEvent.VK_SPACE);
+        move(delta);
     }
 
     boolean attacking = false;
@@ -203,7 +140,7 @@ public class Player extends GameObject {
     public void update(long delta, Graphics2D g) {
         squat();
         block();
-        move(delta);
+        performMove(delta);
         performAttack(delta);
         displayHealth(g);
         super.update(delta, g);
