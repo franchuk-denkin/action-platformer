@@ -7,7 +7,8 @@ import java.util.SortedSet;
 public class Player extends GameObject {
     private int x, y;
     private GameEngine engine;
-    public final int width = 30, height = 50, speed = 200;
+    public final int width = 30, speed = 200, defaultHeight = 50;
+    public int height = defaultHeight;
 
     private long gravityFallingStartTime;
     private long gravityFallingStartY;
@@ -33,7 +34,7 @@ public class Player extends GameObject {
 
     Player(int x, int y, GameEngine engine) {
         engine.setPlayer(this);
-        drawable = new ImageSetDrawable("player.png", x, y);
+        drawable = new ImageSetDrawable(new String[]{"player.png", "player_1.png"}, x, y);
         geometry = new BoxedGeometry(x, y, width, height);
         this.x = x;
         this.y = y;
@@ -181,8 +182,26 @@ public class Player extends GameObject {
         performBowAttack(delta);
     }
 
+    private boolean isSquat = false;
+
+    private void squat() {
+        if(isSquat && !engine.getKeys().contains(KeyEvent.VK_S)) {
+            ((ImageSetDrawable)drawable).setImg(0);
+            isSquat = false;
+            height = defaultHeight;
+            y -= height / 2;
+        }
+        if(!isSquat && engine.getKeys().contains(KeyEvent.VK_S)) {
+            ((ImageSetDrawable)drawable).setImg(1);
+            isSquat  = true;
+            height = defaultHeight / 2;
+            y += defaultHeight / 2;
+        }
+    }
+
     @Override
     public void update(long delta, Graphics2D g) {
+        squat();
         block();
         move(delta);
         performAttack(delta);
