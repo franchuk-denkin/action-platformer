@@ -56,7 +56,8 @@ public class Player extends MovableObject {
         if(!attacking && engine.getKeys().contains(KeyEvent.VK_K)) {
             attacking = true;
             attackStartTime = engine.getGameTime();
-            for (GameObject obj : engine.getObjList()) {
+            for (Object a_obj : engine.getObjList().toArray()) {
+                GameObject obj = (GameObject) a_obj;
                 if(obj instanceof Enemy) {
                     if ((obj.getGeometry().checkCoverage(x + width + attackRange, y + height / 2) && orientation == 1) // атака вправо
                             || (obj.getGeometry().checkCoverage(x - attackRange, y + height / 2) && orientation == -1)) // атака вліво
