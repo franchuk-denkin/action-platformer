@@ -163,6 +163,19 @@ public class Player extends GameObject {
         }
     }
 
+    private boolean blocked = false;
+    private long blockStartT = 0;
+    private final long blockTime = 1000000000;
+
+    private void block() {
+        if (!blocked && engine.getKeys().contains(KeyEvent.VK_SHIFT)) {
+            blocked = true;
+            blockStartT = engine.getGameTime();
+        }
+        if (blocked && engine.getGameTime() - blockStartT >= blockTime)
+            blocked = false;
+    }
+
     private void performAttack(long delta) {
         performSwordAttack(delta);
         performBowAttack(delta);
@@ -170,16 +183,21 @@ public class Player extends GameObject {
 
     @Override
     public void update(long delta, Graphics2D g) {
+        block();
         move(delta);
         performAttack(delta);
         displayHealth(g);
         super.update(delta, g);
     }
 
-    public void attackIt() {
-        health--;
-        if (health < 0)
-            engine.gameOver();
+    public void attackIt(GameObject object) {
+        if (object instanceof Enemy && blocked)
+            ((Enemy)object).stun();
+        if (!blocked) {
+            health--;
+            if (health < 0)
+                engine.gameOver();
+        }
     }
 
     public void displayHealth(Graphics2D g) {
@@ -189,5 +207,9 @@ public class Player extends GameObject {
         for (int i = 0; i < health; i++)
             g.fillRect(10 + 15 * i, 10, 10, 10);
         g.setTransform(t);
+    }
+
+    public boolean isBlocked() {
+        return blocked;
     }
 }

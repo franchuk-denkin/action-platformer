@@ -29,7 +29,7 @@ public abstract class Projectile extends GameObject {
             if (obj.getGeometry().checkCoverage((int) (x + dx * length), (int) (y + dy * length))) {
                 engine.deleteObject(this);
                 if (obj instanceof Player)
-                    ((Player) obj).attackIt();
+                    ((Player) obj).attackIt(this);
                 else if (obj instanceof Enemy)
                     ((Enemy) obj).attackIt(2);
                 return;
