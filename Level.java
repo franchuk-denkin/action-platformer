@@ -22,6 +22,7 @@ public class Level extends GameObject {
     private final int snakeColor = 0xff80FF80;
     private final int wolfColor = 0xff808080;
     private final int swolfColor = 0xffC0C0C0;
+    private final int saurusColor = 0xff800000;
 
     Level(GameEngine eng, String file_prefix) {
         priority = -1;
@@ -44,6 +45,8 @@ public class Level extends GameObject {
                         engine.addObject(WolfSnake.createWolf(engine, j, i));
                     else if(lc == swolfColor)
                         engine.addObject(WolfSnake.createSnowWolf(engine, j, i));
+                    else if(lc == saurusColor)
+                        engine.addObject(new Saurus(engine, j, i));
                 }
         }
         catch (Exception e) {

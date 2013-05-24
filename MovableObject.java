@@ -8,7 +8,7 @@ public abstract class MovableObject extends GameObject {
     protected int speed = 200;
     protected int x, y;
     protected int width, height;
-    protected boolean jumpStartCondition = false;
+    protected boolean jumpStartCondition = false, couldMove = false;
     private double delta_x_sum = 0;
     private long gravityFallingStartTime;
     private long gravityFallingStartY;
@@ -34,6 +34,7 @@ public abstract class MovableObject extends GameObject {
         double delta_x = delta_x_sum;
         int i = multiplier;
         boolean column;
+        couldMove = Math.abs(delta_x) < 1;
         while (Math.abs(i) <= Math.abs(delta_x) && multiplier != 0) {
             column = false;
             for (int j = y; j < y + height; j++) {
@@ -42,8 +43,10 @@ public abstract class MovableObject extends GameObject {
                     if (obj.getGeometry().checkCoverage(cx, j) && obj != this)
                         column = true;
             }
-            if (!column)
+            if (!column) {
                 x += multiplier;
+                couldMove = true;
+            }
             i += multiplier;
             delta_x_sum -= multiplier;
         }
