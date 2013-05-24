@@ -14,6 +14,10 @@ public class Player extends GameObject {
     public double delta_x_sum = 0;
     private boolean falling = false;
     private final int acceleration = 100;
+    private final int jumpingV = -50;
+    private boolean jumped = false;
+
+    private int startV = 0;
 
     private final AffineTransform identityTransform = new AffineTransform();
 
@@ -75,7 +79,8 @@ public class Player extends GameObject {
                     assert y_int >= y + height;
                     min_y = Math.min(min_y, y_int);
                 }
-        if (min_y > y + height) {
+        if (min_y > y + height || jumped) {
+            jumped = false;
             long timestamp = engine.getGameTime();
             if (!falling) {
                 falling = true;
@@ -83,13 +88,18 @@ public class Player extends GameObject {
                 gravityFallingStartY = y;
             }
             double delta_t = (engine.getGameTime() - gravityFallingStartTime) / 1000000000.0;
-            double delta_y = acceleration * delta_t * delta_t / 2 + gravityFallingStartY - y;
+            double delta_y = acceleration * delta_t * delta_t / 2 + startV * delta_t + gravityFallingStartY - y;
             if (y + delta_y + height <= min_y)
                 y += delta_y;
             else {
                 y = min_y - height;
                 falling = false;
+                startV = 0;
             }
+        }
+        else if(engine.getKeys().contains(KeyEvent.VK_W) && !engine.getKeys().contains(KeyEvent.VK_SPACE)) {
+            jumped = true;
+            startV = jumpingV;
         }
         // Оновити координати відображення та геометрії
         drawable.setCoords(x, y);
