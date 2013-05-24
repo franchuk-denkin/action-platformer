@@ -18,6 +18,7 @@ public class GameEngine {
     boolean mainMenuDisplayed, inGameMenuDisplayed;
     SortedSet<GameObject> objList;
     Player player;
+    long gameTime = 0;
 
     GameEngine() {
         keys = new HashSet<Integer>();
@@ -60,11 +61,14 @@ public class GameEngine {
     }
 
     void nextFrame(long delta, Graphics2D g) {
+        if(keyPressed(KeyEvent.VK_ESCAPE))
+            pause();
         if(mainMenuDisplayed)
             mainMenu.draw(delta, g);
         else if (inGameMenuDisplayed)
             inGameMenu.draw(delta, g);
         else {
+            gameTime += delta;
             g.translate(-player.getX() - player.width / 2 + width() / 2, -player.getY() - player.height / 2 + height() / 2);
             for (Object go: objList.toArray())
                 ((GameObject)go).update(delta, g);
@@ -187,5 +191,9 @@ public class GameEngine {
 
     public boolean keyPressed(int code) {
         return pressedKeys.contains(code);
+    }
+
+    public long getGameTime() {
+        return gameTime;
     }
 }

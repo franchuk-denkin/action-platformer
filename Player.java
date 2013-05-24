@@ -68,13 +68,13 @@ public class Player extends GameObject {
                     min_y = Math.min(min_y, y_int);
                 }
         if (min_y > y + height) {
-            long timestamp = System.nanoTime();
+            long timestamp = engine.getGameTime();
             if (!falling) {
                 falling = true;
                 gravityFallingStartTime = timestamp;
                 gravityFallingStartY = y;
             }
-            double delta_t = (System.nanoTime() - gravityFallingStartTime) / 1000000000.0;
+            double delta_t = (engine.getGameTime() - gravityFallingStartTime) / 1000000000.0;
             double delta_y = acceleration * delta_t * delta_t / 2 + gravityFallingStartY - y;
             if (y + delta_y + height <= min_y)
                 y += delta_y;
@@ -94,11 +94,11 @@ public class Player extends GameObject {
     final int swordAttack = 5;
     final int attackRange = 10;
     private void performAttack(long delta) {
-        if(System.nanoTime() - attackStartTime > attackDuration && attacking)
+        if(engine.getGameTime() - attackStartTime > attackDuration && attacking)
             attacking = false;
         if(!attacking && engine.getKeys().contains(KeyEvent.VK_K)) {
             attacking = true;
-            attackStartTime = System.nanoTime();
+            attackStartTime = engine.getGameTime();
             for (GameObject obj : engine.getObjList()) {
                 if(obj instanceof Enemy) {
                     if ((obj.getGeometry().checkCoverage(x + width + attackRange, y + height / 2) && orientation == 1) // атака вправо
