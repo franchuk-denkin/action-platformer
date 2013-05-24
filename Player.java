@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.util.SortedSet;
 
 public class Player extends GameObject {
@@ -12,6 +13,10 @@ public class Player extends GameObject {
     public double delta_x_sum = 0;
     private boolean falling = false;
     private final int acceleration = 100;
+
+    private final AffineTransform identityTransform = new AffineTransform();
+
+    private int health = 3;
 
     int getX() {
         return x;
@@ -113,6 +118,22 @@ public class Player extends GameObject {
     public void update(long delta, Graphics2D g) {
         move(delta);
         performAttack(delta);
+        displayHealth(g);
         super.update(delta, g);
+    }
+
+    public void attackIt() {
+        health--;
+        if (health < 0)
+            engine.gameOver();
+    }
+
+    public void displayHealth(Graphics2D g) {
+        AffineTransform t = g.getTransform();
+        g.setTransform(identityTransform);
+        g.setColor(Color.red);
+        for (int i = 0; i < health; i++)
+            g.fillRect(10 + 15 * i, 10, 10, 10);
+        g.setTransform(t);
     }
 }

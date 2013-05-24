@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class GameObject implements Comparable<GameObject> {
+public abstract class GameObject implements Comparable<GameObject> {
     protected Drawable drawable;
     protected GeometricObject geometry;
     protected int priority = 0;

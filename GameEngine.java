@@ -5,7 +5,10 @@ import java.awt.event.KeyListener;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class GameEngine {
     JFrame window;
@@ -19,6 +22,12 @@ public class GameEngine {
     SortedSet<GameObject> objList;
     Player player;
     long gameTime = 0;
+    private boolean messageScreenDisplayed = false;
+    private String message;
+    private long messageTime = 5000000000l;
+    private long messageTimePassed = 0;
+    private Runnable postMessageCallback;
+    private final Color messageColor = new Color(255, 255, 0);
 
     GameEngine() {
         keys = new HashSet<Integer>();
@@ -52,7 +61,7 @@ public class GameEngine {
         });
 
         showMainMenu();
-        objList= new TreeSet<GameObject>();
+        objList = new TreeSet<GameObject>();
         window.setVisible(true);
     }
 
@@ -61,17 +70,19 @@ public class GameEngine {
     }
 
     void nextFrame(long delta, Graphics2D g) {
-        if(keyPressed(KeyEvent.VK_ESCAPE))
+        if (keyPressed(KeyEvent.VK_ESCAPE))
             pause();
-        if(mainMenuDisplayed)
+        if (mainMenuDisplayed)
             mainMenu.draw(delta, g);
         else if (inGameMenuDisplayed)
             inGameMenu.draw(delta, g);
+        else if (messageScreenDisplayed)
+            drawMessageScreen(delta, g);
         else {
             gameTime += delta;
             g.translate(-player.getX() - player.width / 2 + width() / 2, -player.getY() - player.height / 2 + height() / 2);
-            for (Object go: objList.toArray())
-                ((GameObject)go).update(delta, g);
+            for (Object go : objList.toArray())
+                ((GameObject) go).update(delta, g);
         }
         pressedKeys.clear();
     }
@@ -118,44 +129,49 @@ public class GameEngine {
         objList.add(g);
     }
 
-    void deleteObject(GameObject g){
+    void deleteObject(GameObject g) {
         objList.remove(g);
     }
 
-    void pause(){
+    void pause() {
         paused = true;
         showInGameMenu();
     }
-    void saveGame(String file){
-        try { PrintStream out = new PrintStream(new FileOutputStream("C:\\actionplatformer.sav"));
-        out.print(file);
-        out.close();
-        }
-        catch(Exception e) {
+
+    void saveGame(String file) {
+        try {
+            PrintStream out = new PrintStream(new FileOutputStream("C:\\actionplatformer.sav"));
+            out.print(file);
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    void loadGame(){
-        try { Scanner in = new Scanner(new FileInputStream("C:\\actionplatformer.sav"));
+    void loadGame() {
+        try {
+            Scanner in = new Scanner(new FileInputStream("C:\\actionplatformer.sav"));
             leveln = in.next();
             in.close();
             loadLevel(leveln);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-    void resume(){
+
+    void resume() {
         paused = false;
         inGameMenuDisplayed = false;
     }
-    void exit(){
+
+    void exit() {
         window.setVisible(false);
     }
 
     void showInGameMenu() {
         inGameMenuDisplayed = true;
         final GameEngine engine = this;
-        if(inGameMenu == null) {
+        if (inGameMenu == null) {
             inGameMenu = new Menu(this);
             inGameMenu.addItem("Продовжити", new Runnable() {
                 @Override
@@ -195,5 +211,35 @@ public class GameEngine {
 
     public long getGameTime() {
         return gameTime;
+    }
+
+    public void gameOver() {
+        messageScreenDisplayed = true;
+        message = "Гру закінчено";
+        messageTimePassed = 0;
+        final GameEngine engine = this;
+        postMessageCallback = new Runnable() {
+            @Override
+            public void run() {
+                engine.messageScreenDisplayed = false;
+                engine.loadGame();
+            }
+        };
+    }
+
+    private void drawMessageScreen(long delta, Graphics2D g) {
+        messageTimePassed += delta;
+        if (messageTimePassed > messageTime)
+            postMessageCallback.run();
+        else {
+            Font font = new Font(Font.SERIF, Font.BOLD, 40);
+            FontMetrics metrics = g.getFontMetrics(font);
+            int vsize = metrics.getHeight();
+            int vstart = height() / 2 - vsize / 2;
+            g.setFont(font);
+            g.setColor(messageColor);
+            int width = metrics.stringWidth(message);
+            g.drawString(message, width() / 2 - width / 2, vstart);
+        }
     }
 }
