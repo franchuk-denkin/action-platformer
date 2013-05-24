@@ -33,10 +33,11 @@ public class JDrawingArea extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        long now = System.nanoTime();
         Graphics2D g2d = (Graphics2D)g;
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, getWidth(), getHeight());
-        engine.nextFrame(System.nanoTime() - prevFrameNanoT, g2d);
-        prevFrameNanoT = System.nanoTime();
+        engine.nextFrame(now - prevFrameNanoT, g2d);
+        prevFrameNanoT = now;
     }
 }

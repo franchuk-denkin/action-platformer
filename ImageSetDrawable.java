@@ -8,6 +8,11 @@ import java.io.IOException;
 public class ImageSetDrawable extends Drawable {
     private BufferedImage img;
     private double direction = 0;
+    private boolean proj = false;
+
+    public void setProj(boolean proj) {
+        this.proj = proj;
+    }
 
     public ImageSetDrawable(String file, int x, int y) {
         setCoords(x, y);
@@ -17,6 +22,7 @@ public class ImageSetDrawable extends Drawable {
         catch (IOException e) {
             e.printStackTrace();
         }
+        this.proj = proj;
     }
 
     public ImageSetDrawable(String file, int x, int y, double direction) {
@@ -33,6 +39,8 @@ public class ImageSetDrawable extends Drawable {
         AffineTransform t = canvas.getTransform();
         canvas.translate(translationX, translationY);
         canvas.rotate(direction);
+        if (proj)
+            canvas.translate(0, -img.getHeight()/2);
         canvas.drawImage(img, 0, 0, null);
         canvas.setTransform(t);
     }

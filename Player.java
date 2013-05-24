@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
+import java.util.Set;
 import java.util.SortedSet;
 
 public class Player extends GameObject {
@@ -33,6 +34,7 @@ public class Player extends GameObject {
         this.x = x;
         this.y = y;
         this.engine = engine;
+        priority = 100;
     }
 
     int orientation = 1;
@@ -42,10 +44,11 @@ public class Player extends GameObject {
         SortedSet<GameObject> objList = engine.getObjList();
         int multiplier = 0;
         int cx;
-        if(engine.getKeys().contains(KeyEvent.VK_A))
-            orientation = multiplier = -1;
-        else if(engine.getKeys().contains(KeyEvent.VK_D))
-            orientation = multiplier = 1;
+        if (!engine.getKeys().contains(KeyEvent.VK_SPACE))
+            if(engine.getKeys().contains(KeyEvent.VK_A))
+                orientation = multiplier = -1;
+            else if(engine.getKeys().contains(KeyEvent.VK_D))
+                orientation = multiplier = 1;
         delta_x_sum += speed*multiplier*delta/1000000000.0;
         double delta_x = delta_x_sum;
         int i = multiplier;
@@ -98,7 +101,8 @@ public class Player extends GameObject {
     final long attackDuration = 400000000; // 0.4s
     final int swordAttack = 5;
     final int attackRange = 10;
-    private void performAttack(long delta) {
+
+    private void performSwordAttack(long delta) {
         if(engine.getGameTime() - attackStartTime > attackDuration && attacking)
             attacking = false;
         if(!attacking && engine.getKeys().contains(KeyEvent.VK_K)) {
@@ -107,11 +111,51 @@ public class Player extends GameObject {
             for (GameObject obj : engine.getObjList()) {
                 if(obj instanceof Enemy) {
                     if ((obj.getGeometry().checkCoverage(x + width + attackRange, y + height / 2) && orientation == 1) // атака вправо
-                        || (obj.getGeometry().checkCoverage(x - attackRange, y + height / 2) && orientation == -1)) // атака вліво
+                            || (obj.getGeometry().checkCoverage(x - attackRange, y + height / 2) && orientation == -1)) // атака вліво
                         ((Enemy)obj).attackIt(swordAttack);
                 }
             }
         }
+    }
+
+    private void performBowAttack(long delta) {
+        if(engine.getGameTime() - attackStartTime > attackDuration && attacking)
+            attacking = false;
+        Set<Integer> keys = engine.getKeys();
+        if (!attacking &&engine.getKeys().contains(KeyEvent.VK_SPACE)) {
+            int ax = 0, ay = 0;
+            if (keys.contains(KeyEvent.VK_W)) {
+                ax = 0;
+                ay = -1;
+            }
+            if (keys.contains(KeyEvent.VK_Q)) {
+                ax = -1;
+                ay = -1;
+            }
+            if (keys.contains(KeyEvent.VK_E)) {
+                ax = 1;
+                ay = -1;
+            }
+            if (keys.contains(KeyEvent.VK_A)) {
+                ax = -1;
+                ay = 0;
+            }
+            if (keys.contains(KeyEvent.VK_D)) {
+                ax = 1;
+                ay = 0;
+            }
+            if (ax != 0 || ay != 0) {
+                attacking = true;
+                attackStartTime = engine.getGameTime();
+                Arrow a = new Arrow(engine, x + width / 2, y + height / 2, Math.atan2(ay, ax));
+                engine.addObject(a);
+            }
+        }
+    }
+
+    private void performAttack(long delta) {
+        performSwordAttack(delta);
+        performBowAttack(delta);
     }
 
     @Override
