@@ -26,6 +26,20 @@ public class ImageSetDrawable extends Drawable {
         }
     }
 
+    public ImageSetDrawable(String file, int x, int y, int horiz, int vert) {
+        setCoords(x, y);
+        imgs = new BufferedImage[horiz * vert];
+        try {
+            BufferedImage img = ImageIO.read(new File(file));
+            for (int i = 0; i < vert; i++)
+                for (int j = 0; j < horiz; j++)
+                    imgs[i * horiz + j] = img.getSubimage(j * img.getWidth() / horiz, i * img.getHeight() / vert, img.getWidth() / horiz, img.getHeight() / vert);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public ImageSetDrawable(String[] files, int x, int y) {
         setCoords(x, y);
         imgs = new BufferedImage[files.length];

@@ -14,7 +14,7 @@ public abstract class MovableObject extends GameObject {
     private long gravityFallingStartY;
     private boolean falling = false;
     private final int acceleration = 100;
-    private final int jumpingV = -50;
+    private final int jumpingV = -140;
     private boolean jumped = false;
 
     private int startV = 0;
@@ -40,8 +40,11 @@ public abstract class MovableObject extends GameObject {
             for (int j = y; j < y + height; j++) {
                 cx = multiplier == 1 ? x + width + i : x + i;
                 for (GameObject obj : engine.getObjList())
-                    if (obj.getGeometry().checkCoverage(cx, j) && obj != this)
+                    if (obj.getGeometry().checkCoverage(cx, j) && obj != this) {
                         column = true;
+                        if (!(obj instanceof Level))
+                            couldMove = true;
+                    }
             }
             if (!column) {
                 x += multiplier;

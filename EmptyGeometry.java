@@ -11,6 +11,11 @@ public class EmptyGeometry implements GeometricObject {
     }
 
     @Override
+    public int intersectWithUpRay(int x, int y) {
+        return Integer.MIN_VALUE;
+    }
+
+    @Override
     public boolean checkCoverage(int x, int y) {
         return false;
     }

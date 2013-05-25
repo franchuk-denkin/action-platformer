@@ -17,11 +17,22 @@ public class BoxedGeometry implements GeometricObject {
     public int intersectWithDownRay(int x, int y) {
         if (x >= this.x && x < this.x + width) {
             if (y <= this.y)
-                return y;
+                return this.y;
             if (y <= this.y + height)
                 return this.y + height;
         }
         return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int intersectWithUpRay(int x, int y) {
+        if (x >= this.x && x < this.x + width) {
+            if (y >= this.y + height)
+                return this.y + height;
+            if (y >= this.y)
+                return this.y;
+        }
+        return Integer.MIN_VALUE;
     }
 
     void setCoords(int x, int y) {

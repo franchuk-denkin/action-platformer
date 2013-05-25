@@ -30,6 +30,15 @@ public class LevelGeometry extends Drawable implements GeometricObject {
                 return i;
         return Integer.MAX_VALUE;
     }
+
+    @Override
+    public int intersectWithUpRay(int x, int y) {
+        for (int i = y; i >= 0; i--)
+            if(layout.getRGB(x, i) == 0xff000000)
+                return i;
+        return Integer.MIN_VALUE;
+    }
+
     @Override
     public boolean checkCoverage(int x, int y)   {
         return (x >= 0 && y >= 0 && x < layout.getWidth() && y < layout.getHeight()) ? layout.getRGB(x,y) == 0xff000000 : true;

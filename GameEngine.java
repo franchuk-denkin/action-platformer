@@ -22,6 +22,7 @@ public class GameEngine {
     SortedSet<GameObject> objList;
     Player player;
     long gameTime = 0;
+    int curlevel = 1;
     private boolean messageScreenDisplayed = false;
     private String message;
     private long messageTime = 5000000000l;
@@ -190,6 +191,7 @@ public class GameEngine {
     }
 
     void loadLevel(String file) {
+        curlevel = Integer.parseInt(file);
         objList.clear();
         saveGame(file);
         addObject(new Level(this, file));
@@ -241,5 +243,23 @@ public class GameEngine {
             int width = metrics.stringWidth(message);
             g.drawString(message, width() / 2 - width / 2, vstart);
         }
+    }
+
+    public void nextLevel() {
+        curlevel++;
+        if(curlevel > 3) {
+            messageScreenDisplayed = true;
+            message = "Ви пройшли всю гру";
+            messageTimePassed = 0;
+            final GameEngine engine = this;
+            postMessageCallback = new Runnable() {
+                @Override
+                public void run() {
+                    engine.messageScreenDisplayed = false;
+                    engine.showMainMenu();
+                }
+            };
+        }
+        loadLevel(Integer.toString(curlevel));
     }
 }

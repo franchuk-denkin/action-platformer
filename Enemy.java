@@ -5,7 +5,7 @@ public abstract class Enemy extends MovableObject {
     protected GameEngine engine;
     protected boolean stunned = false;
     protected long stunnedAt;
-    protected final long stunTime = 1000000000;
+    protected long stunTime = 1000000000;
 
     public Enemy(GameEngine eng, int x, int y) {
         super(x, y, eng);
@@ -13,19 +13,28 @@ public abstract class Enemy extends MovableObject {
     }
 
     public void attackIt(int amount) {
+        if(stunned)
+            amount *= 2;
         health -= amount;
-        if (health <= 0)
+        if (health <= 0) {
             engine.deleteObject(this);
+            if(isBoss())
+                engine.nextLevel();
+        }
     }
 
     public boolean isBoss() {
         return false;
     }
 
+    protected void iStun() {
+        stunned = true;
+        stunnedAt = engine.getGameTime();
+    }
+
     public void stun() {
         if (!isBoss()) {
-            stunned = true;
-            stunnedAt = engine.getGameTime();
+            iStun();
         }
     }
 

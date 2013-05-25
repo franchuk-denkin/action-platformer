@@ -5,10 +5,11 @@ import java.util.Set;
 import java.util.SortedSet;
 
 public class Player extends MovableObject {
-    public final int defaultWidth = 30, defaultHeight = 50;
+    public final int defaultWidth = 40, defaultHeight = 64;
 
 
     private final AffineTransform identityTransform = new AffineTransform();
+    private final int horiz = 4, vert = 4;
 
     private int health = 3;
 
@@ -25,7 +26,7 @@ public class Player extends MovableObject {
         engine.setPlayer(this);
         width = defaultWidth;
         height = defaultHeight;
-        drawable = new ImageSetDrawable(new String[]{"player.png", "player_1.png"}, x, y);
+        drawable = new ImageSetDrawable("player.png", x, y, 4, 4);
         geometry = new BoxedGeometry(x, y, width, height);
         this.x = x;
         this.y = y;
@@ -139,6 +140,11 @@ public class Player extends MovableObject {
 
     @Override
     public void update(long delta, Graphics2D g) {
+        int base = orientation == 1 ? 0 : 8;
+        if(attacking)
+            base += 4;
+        int et = (int)((engine.getGameTime() / 250000000) % 4);
+        ((ImageSetDrawable)drawable).setImg(base + et);
         squat();
         block();
         performMove(delta);
@@ -152,7 +158,7 @@ public class Player extends MovableObject {
             ((Enemy)object).stun();
         if (!blocked) {
             health--;
-            if (health < 0)
+            if (health <= 0)
                 engine.gameOver();
         }
     }
@@ -168,5 +174,9 @@ public class Player extends MovableObject {
 
     public boolean isBlocked() {
         return blocked;
+    }
+
+    public void selectImage() {
+
     }
 }
